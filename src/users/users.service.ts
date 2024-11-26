@@ -14,6 +14,14 @@ export class UsersService {
 ){}
 
  async create(createUserDto: CreateUserDto) {
+
+
+  const existUser = await this.userModel.findOne({email:createUserDto.email}).exec();
+
+  if (existUser) {
+
+    throw new UnauthorizedException('this email allredy exist ');
+  }
     const hashedPassword = await hashPassword(createUserDto.password);
     createUserDto.password = hashedPassword;
   

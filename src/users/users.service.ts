@@ -12,7 +12,7 @@ export class UsersService {
           
 ){}
 
- async create(createUserDto: CreateUserDto) {
+ async createUser(createUserDto: CreateUserDto) {
 
 
   const existUser = await this.userModel.findOne({email:createUserDto.email}).exec();
@@ -31,18 +31,18 @@ export class UsersService {
   }
  
 
-  findAll() {
+  getUsers() {
     return this.userModel.find().exec();
   }
 
-  findOne(id: string) {
+  getUserById(id: string) {
     return this.userModel.findById(id);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
+  updateUser(id: string, updateUserDto: UpdateUserDto) {
     return this.userModel.findByIdAndUpdate(id, updateUserDto, {new:true})
   }
-  remove(id: string) {
+  removeUser(id: string) {
     return this.userModel.findByIdAndDelete(id);
   }
 }

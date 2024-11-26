@@ -4,7 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { User } from "src/users/entities/user.entity";
-import { hashPassword } from "src/utils/password.util";
+import { comparePassword, hashPassword } from "src/utils/password.util";
 
 
 @Injectable()
@@ -33,5 +33,27 @@ export class AuthService {
           
           return newUser.save();
         }
+        async login (createUserDto: CreateUserDto):Promise<{token:string}>{
+
+            const existUser = await this.userModel.findOne({email:createUserDto.email}).exec();
+        
+            if (!existUser) {
+        
+              throw new UnauthorizedException('Invalid email or password');
+            }
+            const isPasswordValid = await comparePassword(createUserDto.password, existUser.password);
+        
+            if (!isPasswordValid) {
+        
+              throw new UnauthorizedException('Invalid email or password');
+            }
+        
+            const token = this.jwtService.sign({  name: existUser.name, email: existUser.email });
+        
+           
+            return { token };
+            
+        
+          }
 
 }

@@ -8,27 +8,27 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
+  createEvent(@Body() createEventDto: CreateEventDto) {
+    return this.eventsService.createEvent(createEventDto);
   }
 
   @Get()
-  findAll() {
-    return this.eventsService.findAll();
+  getAllEvents() {
+    return this.eventsService.getAllEvents();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
+  getEventById(@Param('id') id: string) {
+    return this.eventsService.getEventById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventsService.update(+id, updateEventDto);
+  updateEvent(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
+    return this.eventsService.updateEvent(id, updateEventDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(+id);
+  removeEvent(@Param('id') id: string) {
+    return this.eventsService.removeEvent(+id);
   }
 }

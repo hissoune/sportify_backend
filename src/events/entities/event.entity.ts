@@ -17,7 +17,8 @@ export class Event extends Document {
 
     @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
     participants: Types.ObjectId[];
-
+    @Prop({required:true})
+    imagePath:string
     @Prop({ type: Types.ObjectId, ref: 'User', required: true }) 
      owner: Types.ObjectId;
 

@@ -1,11 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { InjectModel, ModelDefinition } from '@nestjs/mongoose';
+import { Event } from './entities/event.entity';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class EventsService {
+  constructor(@InjectModel(Event.name) private readonly EventModel:Model<Event>){}
   createEvent(createEventDto: CreateEventDto) {
-    return 'This action adds a new event';
+   
+    
+    const newEvent =new this.EventModel({
+      name:createEventDto.name,
+      date:createEventDto.date,
+      location:createEventDto.location,
+      imagePath:createEventDto.imagePath,
+      owner:createEventDto.owner
+        });
+    return newEvent.save();
   }
 
   getAllEvents() {

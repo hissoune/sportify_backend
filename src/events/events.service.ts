@@ -20,7 +20,7 @@ export class EventsService {
     return `This action updates a #${id} event`;
   }
 
-  removeEvent(id: number) {
+  removeEvent(id: string) {
     return `This action removes a #${id} event`;
   }
 }

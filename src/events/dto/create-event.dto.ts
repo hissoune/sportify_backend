@@ -17,10 +17,13 @@ export class CreateEventDto {
   @IsMongoId({ each: true })
   @IsArray()
   @ArrayNotEmpty()
-  participants: string[]; 
+  participants?: string[]; 
+
+  @IsString()
+  imagePath: string; 
 
   @IsMongoId()
   @IsOptional()
   owner?: string;
-  
+
 }

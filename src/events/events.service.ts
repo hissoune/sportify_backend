@@ -21,8 +21,8 @@ export class EventsService {
     return newEvent.save();
   }
 
-  getAllEvents() {
-    return `This action returns all events`;
+  getAllEvents(owner:string) {
+    return this.EventModel.find({owner:owner}).exec();
   }
 
   getEventById(id: string) {
@@ -30,7 +30,11 @@ export class EventsService {
   }
 
   updateEvent(id: string, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
+    return this.EventModel.findByIdAndUpdate(
+      id,
+      { $set: updateEventDto }, 
+      { new: true }, 
+    ).exec();
   }
 
   removeEvent(id: string) {

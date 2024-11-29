@@ -26,21 +26,20 @@ import * as path from 'path';
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
+
   @Post()
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: './uploads', 
+        destination: './uploads',
         filename: (req, file, callback) => {
           const uniqueSuffix = `${uuidv4()}${path.extname(file.originalname)}`;
-          callback(null, uniqueSuffix); 
+          callback(null, uniqueSuffix);
         },
       }),
       fileFilter: (req, file, callback) => {
         const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (allowedMimeTypes.includes(file.mimetype)) {
-          console.log(allowedMimeTypes);
-          
           callback(null, true);
         } else {
           callback(new Error('Invalid file type. Only JPEG, PNG, and GIF are allowed.'), false);
@@ -56,33 +55,65 @@ export class EventsController {
     if (!file) {
       throw new UnauthorizedException('Image is required');
     }
-
-    const owner = req.user.id; 
-    createEventDto.owner = owner;
-    console.log(createEventDto);
     
-    createEventDto.imagePath = file.filename; 
-      console.log(createEventDto);
-      
+  
+    const owner = req.user.id;
+    createEventDto.owner = owner;
+  
+    const serverUrl = `${req.protocol}://${req.get('host')}`; 
+    createEventDto.imagePath = `${serverUrl}/uploads/${file.filename}`;
+  
     return this.eventsService.createEvent(createEventDto);
   }
+  
 
   @Get()
-  getAllEvents() {
-    return this.eventsService.getAllEvents();
+  getAllEvents( @Req() req) {
+    const owner = req.user.id; 
+    return this.eventsService.getAllEvents(owner);
   }
 
-  
+
 
   @Get(':id')
   getEventById(@Param('id') id: string) {
     return this.eventsService.getEventById(id);
   }
-
+  
   @Patch(':id')
-  updateEvent(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = `${uuidv4()}${path.extname(file.originalname)}`;
+          callback(null, uniqueSuffix);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Invalid file type. Only JPEG, PNG, and GIF are allowed.'), false);
+        }
+      },
+    }),
+  )
+  async updateEvent(
+    @Param('id') id: string,
+    @Body() updateEventDto: UpdateEventDto,
+    @Req() req,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (file) {
+      const serverUrl = `${req.protocol}://${req.get('host')}`;
+      updateEventDto.imagePath = `${serverUrl}/uploads/${file.filename}`;
+    }
+  
     return this.eventsService.updateEvent(id, updateEventDto);
   }
+    
 
   @Delete(':id')
   removeEvent(@Param('id') id: string) {

@@ -33,7 +33,7 @@ export class AuthService {
           
           return newUser.save();
         }
-        async login (createUserDto: CreateUserDto):Promise<{token:string}>{
+        async login (createUserDto: CreateUserDto):Promise<{token:string,user:User}>{
 
             const existUser = await this.userModel.findOne({email:createUserDto.email}).exec();
         
@@ -51,7 +51,7 @@ export class AuthService {
             const token = this.jwtService.sign({id: existUser._id, name: existUser.name, email: existUser.email,role:existUser.role });
         
            
-            return { token };
+            return { token ,user:existUser};
             
         
           }

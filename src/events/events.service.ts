@@ -38,6 +38,6 @@ export class EventsService {
   }
 
   removeEvent(id: string) {
-    return `This action removes a #${id} event`;
+    return this.EventModel.findByIdAndDelete(id);
   }
 }

@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { log } from 'console';
 
 @Controller('users')
 @UseGuards(AuthGuard)
@@ -11,7 +12,9 @@ export class UsersController {
 
   @Post()
   createUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
+  
+    
+      return this.usersService.createUser(createUserDto);
   }
  
 

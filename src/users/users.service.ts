@@ -25,6 +25,7 @@ export class UsersService {
     createUserDto.password = hashedPassword;
   
     const newUser = new this.userModel(createUserDto);
+  console.log(newUser);
   
     
     return newUser.save();

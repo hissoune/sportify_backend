@@ -15,6 +15,7 @@ export class EventsService {
       name:createEventDto.name,
       date:createEventDto.date,
       location:createEventDto.location,
+      participants:createEventDto.participants,
       imagePath:createEventDto.imagePath,
       owner:createEventDto.owner
         });
@@ -26,10 +27,16 @@ export class EventsService {
   }
 
   getEventById(id: string) {
-    return `This action returns a #${id} event`;
+    return this.EventModel.findById(id).populate('participants' );
   }
 
-  updateEvent(id: string, updateEventDto: UpdateEventDto) {
+ async updateEvent(id: string, updateEventDto: UpdateEventDto) {
+
+    const Event =await this.EventModel.findById(id);
+    const updatedmembers = [...new Set([Event.participants, ...updateEventDto.participants])]; 
+
+    updateEventDto.participants = updatedmembers;
+
     return this.EventModel.findByIdAndUpdate(
       id,
       { $set: updateEventDto }, 

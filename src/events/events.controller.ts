@@ -52,6 +52,8 @@ export class EventsController {
     @Req() req,
     @UploadedFile() file: Express.Multer.File,
   ) {
+
+    
     if (!file) {
       throw new UnauthorizedException('Image is required');
     }
@@ -79,7 +81,7 @@ export class EventsController {
   getEventById(@Param('id') id: string) {
     return this.eventsService.getEventById(id);
   }
-  
+
   @Patch(':id')
   @UseInterceptors(
     FileInterceptor('image', {

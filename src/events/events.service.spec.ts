@@ -4,6 +4,8 @@ import { getModelToken } from "@nestjs/mongoose";
 import { EventsService } from "./events.service";
 import { Test, TestingModule } from "@nestjs/testing";
 import { NotFoundException } from "@nestjs/common";
+import { CreateEventDto } from "./dto/create-event.dto";
+import { UpdateEventDto } from "./dto/update-event.dto";
 
 describe('EventsService', () => {
   let eventService: EventsService;
@@ -32,6 +34,11 @@ describe('EventsService', () => {
 
   const mockModel = {
     findById: jest.fn().mockReturnValue(mockQuery), 
+    create: jest.fn(),
+    findByIdAndUpdate: jest.fn(),
+    findByIdAndDelete: jest.fn(),
+
+
   };
 
   beforeEach(async () => {
@@ -72,6 +79,108 @@ describe('EventsService', () => {
     });
     
   });
+
+  describe('createEvent', () => {
+    it('should create an event and return it', async () => {
+      const createEventDto: CreateEventDto = {
+        name: 'New Event',
+        date: '12-22-2033',
+        location:'dfghj',
+        participants: ['user1', 'user2'],
+        imagePath:'imagepath',
+        owner: 'user1',
+      };
+  
+      const mockEvent = {
+        _id: 'mockEventId',
+        ...createEventDto,
+      };
+  
+      mockModel.create.mockResolvedValue(mockEvent);
+        const result = await eventService.createEvent(createEventDto);
+  
+      expect(mockModel.create).toHaveBeenCalledWith(createEventDto);
+  
+      expect(result).toEqual(mockEvent);
+    });
+  });
+
+  describe('updateEvent', () => {
+    it('should update an event and return the updated event', async () => {
+      const existingEvent = {
+        _id: 'existingEventId',
+        title: 'Old Event',
+        participants: ['user1'],
+        owner: 'user1',
+      };
+  
+      const updateEventDto: UpdateEventDto = {
+        name: 'Updated Event',
+        participants: ['user2'],
+      };
+  
+      const updatedEvent = {
+        ...existingEvent,
+        ...updateEventDto,
+        participants: ['user1', 'user2'], 
+      };
+  
+      mockModel.findById.mockResolvedValue(existingEvent); 
+      mockModel.findByIdAndUpdate.mockResolvedValue(updatedEvent); 
+  
+      const result = await eventService.updateEvent('existingEventId', updateEventDto);
+  
+      expect(mockModel.findById).toHaveBeenCalledWith('existingEventId');
+  
+      expect(mockModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        'existingEventId',
+        { $set: updateEventDto },
+        { new: true }
+      );
+  
+      expect(result).toEqual(updatedEvent);
+    });
+  
+    it('should throw a NotFoundException if the event is not found', async () => {
+      mockModel.findById.mockResolvedValue(null); 
+  
+      await expect(eventService.updateEvent('nonexistentEventId', {})).rejects.toThrowError(NotFoundException);
+  
+      expect(mockModel.findById).toHaveBeenCalledWith('nonexistentEventId');
+    });
+  });
+
+  describe('removeEvent', () => {
+    it('should delete an event and return the deleted event', async () => {
+      const eventToRemove = {
+        _id: 'eventToDeleteId',
+        title: 'Event to be deleted',
+        participants: ['user1'],
+        owner: 'user1',
+      };
+  
+      mockModel.findByIdAndDelete.mockResolvedValue(eventToRemove); 
+  
+      const result = await eventService.removeEvent('eventToDeleteId');
+  
+      expect(mockModel.findByIdAndDelete).toHaveBeenCalledWith('eventToDeleteId');
+  
+      expect(result).toEqual(eventToRemove);
+    });
+  
+    it('should not delete an event and return null if the event is not found', async () => {
+      mockModel.findByIdAndDelete.mockResolvedValue(null);
+  
+      const result = await eventService.removeEvent('nonexistentEventId');
+  
+      expect(mockModel.findByIdAndDelete).toHaveBeenCalledWith('nonexistentEventId');
+  
+      expect(result).toBeNull();
+    });
+  });
+  
+  
+  
   
 
 

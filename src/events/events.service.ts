@@ -47,4 +47,23 @@ export class EventsService {
   removeEvent(id: string) {
     return this.EventModel.findByIdAndDelete(id);
   }
+ async removeParticipant(id:string,participantId:any){
+    const event = await this.EventModel.findById(id);
+    if (!event) {
+        throw new Error('Event not found');
+    }
+
+    if (!event.participants.includes(participantId)) {
+      throw new Error('Participant not found in event');
+  }
+
+  return await this.EventModel.findByIdAndUpdate(
+    { _id: id },              
+    { $pull: { participants: participantId } } ,
+    {new:true}
+
+);
+
+  
+  }
 }

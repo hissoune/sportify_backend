@@ -8,18 +8,11 @@ import { Model } from 'mongoose';
 @Injectable()
 export class EventsService {
   constructor(@InjectModel(Event.name) private readonly EventModel:Model<Event>){}
-  createEvent(createEventDto: CreateEventDto) {
+  createEvent(createEventDto: CreateEventDto):Promise<Event> {
    
     
-    const newEvent =new this.EventModel({
-      name:createEventDto.name,
-      date:createEventDto.date,
-      location:createEventDto.location,
-      participants:createEventDto.participants,
-      imagePath:createEventDto.imagePath,
-      owner:createEventDto.owner
-        });
-    return newEvent.save();
+    const newEvent =this.EventModel.create(createEventDto);
+     return newEvent;
   }
 
   getAllEvents(owner:string) {
@@ -27,22 +20,29 @@ export class EventsService {
   }
 
   getEventById(id: string) {
-    return this.EventModel.findById(id).populate('participants' );
+    return this.EventModel.findById(id).populate({ path: 'participants', model: 'User' }).populate('owner');
   }
+  async updateEvent(id: string, updateEventDto: UpdateEventDto) {
+    const event = await this.EventModel.findById(id);
+    if (!event) {
+        throw new Error('Event not found');
+    }
 
- async updateEvent(id: string, updateEventDto: UpdateEventDto) {
-
-    const Event =await this.EventModel.findById(id);
-    const updatedmembers = [...new Set([Event.participants, ...updateEventDto.participants])]; 
-
-    updateEventDto.participants = updatedmembers;
+    if (updateEventDto.participants) {
+        const uniqueParticipants = new Set([
+            ...event.participants.map((p) => p.toString()),
+            ...updateEventDto.participants, 
+        ]);
+        updateEventDto.participants = Array.from(uniqueParticipants);
+    }
 
     return this.EventModel.findByIdAndUpdate(
-      id,
-      { $set: updateEventDto }, 
-      { new: true }, 
+        id,
+        { $set: updateEventDto },
+        { new: true }
     ).exec();
-  }
+}
+
 
   removeEvent(id: string) {
     return this.EventModel.findByIdAndDelete(id);

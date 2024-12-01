@@ -16,7 +16,7 @@ export class EventsService {
   }
 
   getAllEvents(owner:string) {
-    return this.EventModel.find({owner:owner}).exec();
+    return this.EventModel.find({owner:owner}).populate({ path: 'participants', model: 'User' }).populate('owner').exec();
   }
 
   getEventById(id: string) {

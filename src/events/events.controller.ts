@@ -121,4 +121,11 @@ export class EventsController {
   removeEvent(@Param('id') id: string) {
     return this.eventsService.removeEvent(id);
   }
+
+  @Delete('removeParticipant/:id')
+  removeParticipant(@Param('id') id: string, @Body() body){
+   const  participantId = body.participantId
+    return this.eventsService.removeParticipant(id,participantId);
+
+  }
 }

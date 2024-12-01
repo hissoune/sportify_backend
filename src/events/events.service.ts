@@ -47,7 +47,7 @@ export class EventsService {
         id,
         { $set: updateEventDto },
         { new: true }
-    ).exec();
+    );
 }
 
 

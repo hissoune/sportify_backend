@@ -41,6 +41,8 @@ export class UsersService {
   }
 
   updateUser(id: string, updateUserDto: UpdateUserDto) {
+    console.log(updateUserDto);
+    
     return this.userModel.findByIdAndUpdate(id, updateUserDto, {new:true})
   }
   removeUser(id: string) {

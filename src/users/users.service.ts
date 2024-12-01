@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {  hashPassword } from 'src/utils/password.util';
+import {  hashPassword } from '../utils/password.util';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entities/user.entity';
 import { Model } from 'mongoose';
@@ -15,7 +15,7 @@ export class UsersService {
  async createUser(createUserDto: CreateUserDto) {
 
 
-  const existUser = await this.userModel.findOne({email:createUserDto.email}).exec();
+  const existUser = await this.userModel.findOne({email:createUserDto.email});
 
   if (existUser) {
 
@@ -24,16 +24,15 @@ export class UsersService {
     const hashedPassword = await hashPassword(createUserDto.password);
     createUserDto.password = hashedPassword;
   
-    const newUser = new this.userModel(createUserDto);
-  console.log(newUser);
+    const newUser =this.userModel.create(createUserDto);
   
     
-    return newUser.save();
+    return newUser;
   }
  
 
   getUsers() {
-    return this.userModel.find().exec();
+    return this.userModel.find();
   }
 
   getUserById(id: string) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectModel, ModelDefinition } from '@nestjs/mongoose';
@@ -19,13 +19,20 @@ export class EventsService {
     return this.EventModel.find({owner:owner}).populate({ path: 'participants', model: 'User' }).populate('owner').exec();
   }
 
-  getEventById(id: string) {
-    return this.EventModel.findById(id).populate({ path: 'participants', model: 'User' }).populate('owner');
+  async getEventById(id: string) {
+
+    const event = await this.EventModel.findById(id).populate({ path: 'participants', model: 'User' }).populate('owner').exec();
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+
+    }
+    return event;
   }
   async updateEvent(id: string, updateEventDto: UpdateEventDto) {
     const event = await this.EventModel.findById(id);
     if (!event) {
-        throw new Error('Event not found');
+        throw new NotFoundException('Event not found');
     }
 
     if (updateEventDto.participants) {
@@ -40,7 +47,7 @@ export class EventsService {
         id,
         { $set: updateEventDto },
         { new: true }
-    ).exec();
+    );
 }
 
 

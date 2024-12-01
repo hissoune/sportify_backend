@@ -37,6 +37,7 @@ describe('EventsService', () => {
     create: jest.fn(),
     findByIdAndUpdate: jest.fn(),
     findByIdAndDelete: jest.fn(),
+    find: jest.fn().mockReturnValue(mockQuery)
 
 
   };
@@ -109,7 +110,7 @@ describe('EventsService', () => {
     it('should update an event and return the updated event', async () => {
       const existingEvent = {
         _id: 'existingEventId',
-        title: 'Old Event',
+        name: 'Old Event',
         participants: ['user1'],
         owner: 'user1',
       };
@@ -178,6 +179,111 @@ describe('EventsService', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('removeParticipant', () => {
+    it('should remove a participant from an event', async () => {
+      const eventWithParticipant = {
+        _id: 'eventId',
+        title: 'Sample Event',
+        participants: ['participantId1', 'participantId2'],
+        owner: 'ownerId',
+      };
+  
+      mockModel.findById.mockResolvedValue(eventWithParticipant); 
+      mockModel.findByIdAndUpdate.mockResolvedValue({
+        ...eventWithParticipant,
+        participants: ['participantId2'], 
+      });
+  
+      const result = await eventService.removeParticipant('eventId', 'participantId1');
+  
+      expect(mockModel.findById).toHaveBeenCalledWith('eventId');
+  
+      expect(mockModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        { _id: 'eventId' },
+        { $pull: { participants: 'participantId1' } },
+        { new: true }
+      );
+  
+      expect(result.participants).toEqual(['participantId2']);
+    });
+  
+    it('should throw an error if the event is not found', async () => {
+      mockModel.findById.mockResolvedValue(null);
+  
+      await expect(eventService.removeParticipant('nonexistentEventId', 'participantId1')).rejects.toThrowError('Event not found');
+  
+      expect(mockModel.findById).toHaveBeenCalledWith('nonexistentEventId');
+    });
+  
+    it('should throw an error if the participant is not found in the event', async () => {
+      const eventWithoutParticipant = {
+        _id: 'eventId',
+        title: 'Sample Event',
+        participants: ['participantId2'],
+        owner: 'ownerId',
+      };
+  
+      mockModel.findById.mockResolvedValue(eventWithoutParticipant); 
+  
+      await expect(eventService.removeParticipant('eventId', 'participantId1')).rejects.toThrowError('Participant not found in event');
+  
+      expect(mockModel.findById).toHaveBeenCalledWith('eventId');
+    });
+  });
+  
+  describe('getAllEvents', () => {
+    it('should return events for the given owner with populated fields', async () => {
+      const mockEvents = [
+        {
+          _id: 'eventId1',
+          title: 'Event 1',
+          owner: 'ownerId',
+          participants: ['participantId1', 'participantId2'],
+        },
+        {
+          _id: 'eventId2',
+          title: 'Event 2',
+          owner: 'ownerId',
+          participants: ['participantId3'],
+        },
+      ];
+  
+      const mockQuery = {
+        populate: jest.fn().mockReturnThis(), 
+        exec: jest.fn().mockResolvedValue(mockEvents), 
+      };
+  
+      mockModel.find.mockReturnValue(mockQuery);
+  
+      const result = await eventService.getAllEvents('ownerId');
+  
+      expect(mockModel.find).toHaveBeenCalledWith({ owner: 'ownerId' });
+  
+      expect(mockQuery.populate).toHaveBeenCalledWith({ path: 'participants', model: 'User' });
+      expect(mockQuery.populate).toHaveBeenCalledWith('owner');
+  
+      expect(result).toEqual(mockEvents);
+    });
+    it('should return an empty array if no events are found for the given owner', async () => {
+      const mockQuery = {
+        populate: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([]), 
+      };
+  
+      mockModel.find.mockReturnValue(mockQuery);
+  
+      const result = await eventService.getAllEvents('ownerId');
+  
+      expect(mockModel.find).toHaveBeenCalledWith({ owner: 'ownerId' });
+  
+      expect(mockQuery.populate).toHaveBeenCalledWith({ path: 'participants', model: 'User' });
+      expect(mockQuery.populate).toHaveBeenCalledWith('owner');
+  
+      expect(result).toEqual([]);
+    });
+  });
+  
   
   
   

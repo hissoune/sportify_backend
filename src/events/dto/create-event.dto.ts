@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsDateString, IsMongoId, IsArray, ArrayNotEmpty, IsOptional, Validate } from 'class-validator';
+import { ObjectId, Types } from 'mongoose';
 
 
 function IsDateAfter24Hours(date: string): boolean {
@@ -27,10 +28,9 @@ export class CreateEventDto {
   @IsNotEmpty()
   location: string;
 
-  @IsMongoId({ each: true })
   @IsArray()
   @ArrayNotEmpty()
-  participants?: string[]; 
+  participants?: (string | Types.ObjectId[])[]; 
 
     @IsString()
   imagePath: string; 

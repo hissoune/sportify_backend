@@ -16,8 +16,8 @@ import { User, userSchema } from './users/entities/user.entity';
   imports: [
     MongooseModule.forFeature([{name:User.name,schema:userSchema}]),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'), // Serve files from the uploads directory
-      serveRoot: '/uploads', // Base URL for accessing files
+      rootPath: join(__dirname, '..', 'uploads'), 
+      serveRoot: '/uploads', 
     }),
     ConfigModule.forRoot({
       isGlobal: true,

@@ -10,6 +10,10 @@ export class User extends Document {
 @Prop({ required: true, unique: true })
   email: string;
 
+@Prop({enum:['man','women'],default:'women'})
+gender:string
+  
+
 @Prop({ required: true })
   password: string;
 

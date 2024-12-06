@@ -55,6 +55,8 @@ describe('UsersService', () => {
         name: 'ff',
         email: 'test@example.com',
         password: 'password123',
+        imagePath:"sdfghjkl"
+
       };
 
       jest.spyOn(mockUserModel, 'findOne').mockResolvedValue(null); 
@@ -69,6 +71,7 @@ describe('UsersService', () => {
         name: 'ff',
         email: 'test@example.com',
         password: 'password123',
+        imagePath:"sdfghjkl"
       };
 
       jest.spyOn(mockUserModel, 'findOne').mockResolvedValue(mockUser); 

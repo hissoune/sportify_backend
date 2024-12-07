@@ -74,7 +74,11 @@ export class EventsController {
     const owner = req.user.id; 
     return this.eventsService.getAllEvents(owner);
   }
-
+  @Get('public')
+  getEventsForParticipant (@Req() req){
+    const participantId = req.user.id;
+    return this.eventsService.getEventsForParticipant(participantId);
+  }
 
 
   @Get(':id')

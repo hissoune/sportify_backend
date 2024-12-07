@@ -18,9 +18,8 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { v4 as uuidv4 } from 'uuid'; // To generate unique filenames
+import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
-import { log } from 'console';
 
 @Controller('events')
 @UseGuards(AuthGuard)
@@ -75,7 +74,11 @@ export class EventsController {
     const owner = req.user.id; 
     return this.eventsService.getAllEvents(owner);
   }
-
+  @Get('public')
+  getEventsForParticipant (@Req() req){
+    const participantId = req.user.id;
+    return this.eventsService.getEventsForParticipant(participantId);
+  }
 
 
   @Get(':id')

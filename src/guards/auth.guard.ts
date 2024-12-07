@@ -2,7 +2,6 @@ import {
     CanActivate,
     ExecutionContext,
     Injectable,
-    Logger,
     UnauthorizedException,
   } from '@nestjs/common';
   import { JwtService } from '@nestjs/jwt';
@@ -30,9 +29,7 @@ import { Model } from 'mongoose';
   
       try {
         const payload = this.jwtService.verify(token);
-          
        
-           
           request.user = payload;
   
         return true;

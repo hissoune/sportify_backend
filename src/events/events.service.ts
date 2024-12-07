@@ -29,6 +29,14 @@ export class EventsService {
     }
     return event;
   }
+ async getEventsForParticipant(participantId:string){
+    console.log(participantId);
+    
+
+    return await this.EventModel.find({participants:participantId}).populate({ path: 'participants', model: 'User' }).populate('owner').exec();
+
+ }
+
   async updateEvent(id: string, updateEventDto: UpdateEventDto) {
     const event = await this.EventModel.findById(id);
     if (!event) {
